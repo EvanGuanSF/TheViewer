@@ -247,7 +247,10 @@ namespace The_Viewer
             if (result == DialogResult.OK)
             {
                 ImageOperations.SetWorkingDir(selectFolderDialog.SelectedPath);
-                GetNextPicture();
+
+                mainViewerBox.Image = null;
+                mainViewerBox.Image = ImageOperations.GetCurrentImage();
+                workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
             }
         }
 

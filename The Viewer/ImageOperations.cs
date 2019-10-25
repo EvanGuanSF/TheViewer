@@ -326,7 +326,7 @@ namespace The_Viewer
         {
             if (Images.filePaths.Count == 0)
             {
-                return @"Bad folder.";
+                return @"No images in selected folder.";
             }
             else
                 return Convert.ToString(Images.filePaths[Images.curFilePathIndex]);
