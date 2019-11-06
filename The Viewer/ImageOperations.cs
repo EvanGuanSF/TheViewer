@@ -168,7 +168,10 @@ namespace The_Viewer
             }
 
             var listOfStuff = Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
-            .Where(s => s.EndsWith(".png") || s.EndsWith(".jpg") || s.EndsWith(".bmp") || s.EndsWith(".gif"));
+            .Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
+                s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                s.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
+                s.EndsWith(".gif", StringComparison.OrdinalIgnoreCase));
 
             /*/ Inefficient given current implementaion.
             var listOfStuff = Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
