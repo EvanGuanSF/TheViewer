@@ -18,27 +18,6 @@ namespace The_Viewer
         }
 
         /// <summary>
-        /// Makes the window undraggable. Currently not utilised.
-        /// </summary>
-        /// <param name="m"></param>
-        protected override void WndProc(ref Message m)
-        {
-            const int WM_NCLBUTTONDOWN = 161;
-            const int WM_SYSCOMMAND = 274;
-            const int HTCAPTION = 2;
-            const int SC_MOVE = 61456;
-            if ((m.Msg == WM_SYSCOMMAND) && (m.WParam.ToInt32() == SC_MOVE))
-            {
-                return;
-            }
-            if ((m.Msg == WM_NCLBUTTONDOWN) && (m.WParam.ToInt32() == HTCAPTION))
-            {
-                return;
-            }
-            base.WndProc(ref m);
-        }
-
-        /// <summary>
         /// Collect garbage on timer.
         /// </summary>
         /// <param name="sender"></param>
@@ -50,7 +29,7 @@ namespace The_Viewer
     }
 
     /// <summary>
-    /// Selected Win API Function Calls.
+    /// Selected Win API Function Calls to hide the taskbar while in fullscreen.
     /// </summary>
     public class WinApi
     {
@@ -101,8 +80,6 @@ namespace The_Viewer
             {
                 IsMaximized = true;
                 Save(targetForm);
-                targetForm.WindowState = FormWindowState.Maximized;
-                targetForm.FormBorderStyle = FormBorderStyle.None;
                 targetForm.TopMost = true;
                 WinApi.SetWinFullScreen(targetForm.Handle);
             }

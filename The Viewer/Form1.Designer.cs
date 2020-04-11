@@ -67,16 +67,16 @@
             // 
             // mainViewerBox
             // 
-            this.mainViewerBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.mainViewerBox.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.mainViewerBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.mainViewerBox.Location = new System.Drawing.Point(0, 0);
             this.mainViewerBox.Margin = new System.Windows.Forms.Padding(0);
             this.mainViewerBox.Name = "mainViewerBox";
             this.mainViewerBox.Size = new System.Drawing.Size(2560, 1396);
-            this.mainViewerBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.mainViewerBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.mainViewerBox.TabIndex = 0;
             this.mainViewerBox.TabStop = false;
+            this.mainViewerBox.WaitOnLoad = true;
             // 
             // garbageTimer
             // 
@@ -230,6 +230,7 @@
             this.ClientSize = new System.Drawing.Size(2560, 1420);
             this.Controls.Add(this.viewerControlsPanel);
             this.Controls.Add(this.mainViewerPanel);
+            this.DoubleBuffered = true;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.KeyPreview = true;

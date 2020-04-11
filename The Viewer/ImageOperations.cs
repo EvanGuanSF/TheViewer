@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
@@ -114,26 +113,10 @@ namespace The_Viewer
         /// <returns>Image at current working index</returns>
         public static Image GetCurrentImage()
         {
-            // Return...
-            // ... A blank image if there are no valid images found.
-            if (Images.filePaths.Count == 0)
-            {
-                return new Bitmap(64, 64, PixelFormat.Format32bppRgb);
-            }
-
-            // Try to set up the image.
-            if (File.Exists(Images.filePaths[Images.curFilePathIndex]))
+            if (Images.filePaths.Count > 0 && File.Exists(Images.filePaths[Images.curFilePathIndex]))
             {
                 Image tempImage = Image.FromFile(Images.filePaths[Images.curFilePathIndex]);
-
-                // ... A .gif file as-is.
-                if (Convert.ToString(Images.filePaths[Images.curFilePathIndex]).EndsWith(".gif"))
-                {
-                    return tempImage;
-                }
-
-                // ... A resized image if a valid image is found.
-                return GetResizedImage(ViewerDimensions.panelWidth, ViewerDimensions.panelHeight, tempImage);
+                return tempImage;
             }
             else
             {
@@ -151,7 +134,7 @@ namespace The_Viewer
             int randNum = Images.curFilePathIndex = rand.Next(0, Images.filePaths.Count());
 
             Image tempImage = Image.FromFile(Images.filePaths[randNum]);
-            return GetResizedImage(ViewerDimensions.panelWidth, ViewerDimensions.panelHeight, tempImage);
+            return tempImage;
         }
 
         /// <summary>
@@ -161,41 +144,34 @@ namespace The_Viewer
         /// <returns>List of paths</returns>
         private static List<string> GetAllImages(string directory)
         {
-            List<string> newList = new List<string>(); ;
+            List<string> newListOfImagePaths = new List<string>(); ;
             if (!Directory.Exists(directory))
             {
-                return newList;
+                return newListOfImagePaths;
             }
 
-            var listOfStuff = Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
+            var listOfImagePaths = Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
             .Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase) ||
                 s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
                 s.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase) ||
                 s.EndsWith(".gif", StringComparison.OrdinalIgnoreCase));
 
-            /*/ Inefficient given current implementaion.
-            var listOfStuff = Directory.EnumerateFiles(directory, "*.*", SearchOption.AllDirectories)
-            .Where(s => s.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
-                || s.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
-                || s.EndsWith(".bmp", StringComparison.OrdinalIgnoreCase));
-            //*/
-
-            int count = listOfStuff.Count();
-            string[] arrayOfStuff;
+            int count = listOfImagePaths.Count();
+            string[] arrayOfImagePaths;
 
             if (count > 0)
             {
-                arrayOfStuff = new string[count - 1];
-                arrayOfStuff = listOfStuff.ToArray();
+                arrayOfImagePaths = new string[count - 1];
+                arrayOfImagePaths = listOfImagePaths.ToArray();
             }
             else
             {
-                arrayOfStuff = new string[0];
+                arrayOfImagePaths = new string[0];
             }
 
-            Array.Sort(arrayOfStuff, new AlphanumComparatorFast());
-            newList = arrayOfStuff.ToList();
-            return newList;
+            Array.Sort(arrayOfImagePaths, new AlphanumComparatorFast());
+            newListOfImagePaths = arrayOfImagePaths.ToList();
+            return newListOfImagePaths;
         }
 
         /// <summary>
@@ -208,81 +184,6 @@ namespace The_Viewer
             Images.filePaths.Clear();
             Images.curFilePathIndex = 0;
             Images.filePaths = GetAllImages(dir);
-        }
-
-        /// <summary>
-        /// Assembles parts then returns a fixed aspect image within set boundaries.
-        /// </summary>
-        /// <param name="maxWidth"></param>
-        /// <param name="maxHeight"></param>
-        /// <param name="source"></param>
-        /// <returns>Scaled Image</returns>
-        public static Image GetResizedImage(int? maxWidth, int? maxHeight, Image source)
-        {
-            Size newSize = new Size();
-            newSize = CalculateImageElementDimensions(maxWidth, maxHeight, source.Size);
-            int width = newSize.Width;
-            int height = newSize.Height;
-
-
-            //return ResizedImage(width, height, source);
-            // Resize the image.
-            var destRect = new Rectangle(0, 0, width, height);
-            var destImage = new Bitmap(width, height);
-
-            destImage.SetResolution(source.HorizontalResolution, source.VerticalResolution);
-
-            using (var graphics = Graphics.FromImage(destImage))
-            {
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                graphics.CompositingQuality = CompositingQuality.HighQuality;
-                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
-                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
-                using (var wrapMode = new ImageAttributes())
-                {
-                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
-                    graphics.DrawImage(source, destRect, 0, 0, source.Width, source.Height, GraphicsUnit.Pixel, wrapMode);
-                }
-            }
-
-            return destImage;
-        }
-
-        /// <summary>
-        /// Calculates and returns a bounded Size given source Size. Maintains aspect ratio.
-        /// </summary>
-        /// <param name="maxWidth"></param>
-        /// <param name="maxHeight"></param>
-        /// <param name="source"></param>
-        /// <returns>Scaled Size</returns>
-        private static Size CalculateImageElementDimensions(int? maxWidth, int? maxHeight, Size source)
-        {
-            // Check to see if the dimensions received are valid values.
-            if (!maxWidth.HasValue && !maxHeight.HasValue)
-                throw new ArgumentException("At least one scale factor (toWidth or toHeight) must not be null.");
-            if (source.Height == 0 || source.Width == 0)
-                throw new ArgumentException("Cannot scale size from zero.");
-
-            double? widthScale = null;
-            double? heightScale = null;
-
-            // Calculate the new dimensions.
-            if (maxWidth.HasValue)
-            {
-                widthScale = maxWidth.Value / (double)source.Width;
-            }
-            if (maxHeight.HasValue)
-            {
-                heightScale = maxHeight.Value / (double)source.Height;
-            }
-
-            double scale = Math.Min((double)(widthScale ?? heightScale),
-                                     (double)(heightScale ?? widthScale));
-
-            // Send the dimensions of the new image.
-            return new Size((int)Math.Floor(source.Width * scale), (int)Math.Ceiling(source.Height * scale));
         }
 
         /// <summary>
