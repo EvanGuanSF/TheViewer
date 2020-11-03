@@ -21,22 +21,22 @@ namespace The_Viewer
                 return 0;
             }
 
-            int len1 = s1.Length;
-            int len2 = s2.Length;
-            int marker1 = 0;
-            int marker2 = 0;
+            long len1 = s1.Length;
+            long len2 = s2.Length;
+            long marker1 = 0;
+            long marker2 = 0;
 
             // Walk through two the strings with two markers.
             while (marker1 < len1 && marker2 < len2)
             {
-                char ch1 = s1[marker1];
-                char ch2 = s2[marker2];
+                char ch1 = s1[(int) marker1];
+                char ch2 = s2[(int) marker2];
 
                 // Some buffers we can build up characters in for each chunk.
                 char[] space1 = new char[len1];
-                int loc1 = 0;
+                long loc1 = 0;
                 char[] space2 = new char[len2];
-                int loc2 = 0;
+                long loc2 = 0;
 
                 // Walk through all following characters that are digits or
                 // characters in BOTH strings starting at the appropriate marker.
@@ -48,7 +48,7 @@ namespace The_Viewer
 
                     if (marker1 < len1)
                     {
-                        ch1 = s1[marker1];
+                        ch1 = s1[(int) marker1];
                     }
                     else
                     {
@@ -63,7 +63,7 @@ namespace The_Viewer
 
                     if (marker2 < len2)
                     {
-                        ch2 = s2[marker2];
+                        ch2 = s2[(int) marker2];
                     }
                     else
                     {
@@ -76,12 +76,12 @@ namespace The_Viewer
                 string str1 = new string(space1);
                 string str2 = new string(space2);
 
-                int result;
+                long result;
 
                 if (char.IsDigit(space1[0]) && char.IsDigit(space2[0]))
                 {
-                    int thisNumericChunk = int.Parse(str1);
-                    int thatNumericChunk = int.Parse(str2);
+                    long thisNumericChunk = long.Parse(str1);
+                    long thatNumericChunk = long.Parse(str2);
                     result = thisNumericChunk.CompareTo(thatNumericChunk);
                 }
                 else
@@ -91,10 +91,10 @@ namespace The_Viewer
 
                 if (result != 0)
                 {
-                    return result;
+                    return (int)result;
                 }
             }
-            return len1 - len2;
+            return (int) (len1 - len2);
         }
     }
 }

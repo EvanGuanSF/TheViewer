@@ -62,7 +62,7 @@
             this.mainViewerPanel.Location = new System.Drawing.Point(0, 0);
             this.mainViewerPanel.Margin = new System.Windows.Forms.Padding(0);
             this.mainViewerPanel.Name = "mainViewerPanel";
-            this.mainViewerPanel.Size = new System.Drawing.Size(2560, 1396);
+            this.mainViewerPanel.Size = new System.Drawing.Size(1000, 976);
             this.mainViewerPanel.TabIndex = 0;
             // 
             // mainViewerBox
@@ -72,11 +72,12 @@
             this.mainViewerBox.Location = new System.Drawing.Point(0, 0);
             this.mainViewerBox.Margin = new System.Windows.Forms.Padding(0);
             this.mainViewerBox.Name = "mainViewerBox";
-            this.mainViewerBox.Size = new System.Drawing.Size(2560, 1396);
+            this.mainViewerBox.Size = new System.Drawing.Size(1000, 976);
             this.mainViewerBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.mainViewerBox.TabIndex = 0;
             this.mainViewerBox.TabStop = false;
             this.mainViewerBox.WaitOnLoad = true;
+            this.mainViewerBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mainViewerBox_MouseClick);
             // 
             // garbageTimer
             // 
@@ -128,10 +129,10 @@
             this.timerSelectionBox.ForeColor = System.Drawing.Color.White;
             this.timerSelectionBox.FormattingEnabled = true;
             this.timerSelectionBox.Items.AddRange(new object[] {
+            "1 Seconds",
             "2 Seconds",
-            "3 Seconds (Default)",
+            "3 Seconds  (Default) ",
             "5 Seconds",
-            "8 Seconds",
             "10 Seconds",
             "15 Seconds",
             "20 Seconds",
@@ -216,18 +217,19 @@
             this.viewerControlsPanel.Controls.Add(this.timerToggleButton);
             this.viewerControlsPanel.Controls.Add(this.timerSelectionBox);
             this.viewerControlsPanel.Controls.Add(this.browseForWorkingDirButton);
-            this.viewerControlsPanel.Location = new System.Drawing.Point(0, 1396);
+            this.viewerControlsPanel.Location = new System.Drawing.Point(0, 976);
             this.viewerControlsPanel.Margin = new System.Windows.Forms.Padding(0);
             this.viewerControlsPanel.Name = "viewerControlsPanel";
-            this.viewerControlsPanel.Size = new System.Drawing.Size(2560, 24);
+            this.viewerControlsPanel.Size = new System.Drawing.Size(1000, 24);
             this.viewerControlsPanel.TabIndex = 7;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoSize = true;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(2560, 1420);
+            this.ClientSize = new System.Drawing.Size(1000, 1000);
             this.Controls.Add(this.viewerControlsPanel);
             this.Controls.Add(this.mainViewerPanel);
             this.DoubleBuffered = true;
@@ -240,6 +242,7 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             this.Text = "The View";
+            this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseWheel);
             this.mainViewerPanel.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.mainViewerBox)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.garbageTimer)).EndInit();

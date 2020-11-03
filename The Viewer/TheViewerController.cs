@@ -23,6 +23,9 @@ namespace The_Viewer
             // Set screen resolution
             ViewerDimensions.SetRegularSizes(Screen.PrimaryScreen.WorkingArea.Size);
             this.MaximumSize = Screen.PrimaryScreen.WorkingArea.Size;
+            this.Size = Screen.PrimaryScreen.WorkingArea.Size;
+
+            Console.WriteLine(Screen.PrimaryScreen.WorkingArea.Size);
 
             // Check if opened with file association. Check file, set path and index.
             if (Environment.GetCommandLineArgs().Length > 1 && Environment.GetCommandLineArgs() != null && File.Exists(Environment.GetCommandLineArgs()[1]))
@@ -52,7 +55,7 @@ namespace The_Viewer
             inputsAllowed = true;
 
             timerToggleButton.BackColor = Color.FromArgb(128, 0, 0);
-            timerSelectionBox.SelectedIndex = 1;
+            timerSelectionBox.SelectedIndex = 2;
         }
 
         /// <summary>
@@ -159,16 +162,16 @@ namespace The_Viewer
             switch (timerSelectionBox.SelectedIndex)
             {
                 case 0:
-                    autoplayTimer.Interval = baseInterval * 2;
+                    autoplayTimer.Interval = baseInterval * 1;
                     break;
                 case 1:
-                    autoplayTimer.Interval = baseInterval * 3;
+                    autoplayTimer.Interval = baseInterval * 2;
                     break;
                 case 2:
-                    autoplayTimer.Interval = baseInterval * 5;
+                    autoplayTimer.Interval = baseInterval * 3;
                     break;
                 case 3:
-                    autoplayTimer.Interval = baseInterval * 8;
+                    autoplayTimer.Interval = baseInterval * 5;
                     break;
                 case 4:
                     autoplayTimer.Interval = baseInterval * 10;
@@ -278,6 +281,24 @@ namespace The_Viewer
                         GetNextPicture();
                         return true;
                     }
+                case Keys.Up:
+                    {
+                        if (timerSelectionBox.SelectedIndex > 0)
+                        {
+                            timerSelectionBox.SelectedIndex--;
+                            timerSelectionBox_SelectionChangeCommitted(this, null);
+                        }
+                        return true;
+                    }
+                case Keys.Down:
+                    {
+                        if (timerSelectionBox.SelectedIndex < timerSelectionBox.Items.Count - 1)
+                        {
+                            timerSelectionBox.SelectedIndex++;
+                            timerSelectionBox_SelectionChangeCommitted(this, null);
+                        }
+                        return true;
+                    }
                 case Keys.Space:
                     {
                         ToggleTimer();
@@ -298,6 +319,41 @@ namespace The_Viewer
                     {
                         return false;
                     }
+            }
+        }
+
+        private void Form1_MouseWheel(object sender, MouseEventArgs mouseEvent)
+        {
+            if(mouseEvent.Delta > 0)
+            {
+                // Scrolled up.
+                if (timerSelectionBox.SelectedIndex > 0)
+                {
+                    timerSelectionBox.SelectedIndex--;
+                    timerSelectionBox_SelectionChangeCommitted(this, null);
+                }
+            }
+            else
+            {
+                // Scrolled down.
+                if (timerSelectionBox.SelectedIndex < timerSelectionBox.Items.Count - 1)
+                {
+                    timerSelectionBox.SelectedIndex++;
+                    timerSelectionBox_SelectionChangeCommitted(this, null);
+                }
+            }
+        }
+
+        private void mainViewerBox_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                ToggleFullscreen();
+            }
+
+            if (e.Button == MouseButtons.Middle)
+            {
+                ToggleTimer();
             }
         }
 
