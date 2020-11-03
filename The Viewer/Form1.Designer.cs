@@ -76,7 +76,7 @@
             this.mainViewerBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.mainViewerBox.TabIndex = 0;
             this.mainViewerBox.TabStop = false;
-            this.mainViewerBox.WaitOnLoad = true;
+            this.mainViewerBox.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.mainViewerBox_LoadCompleted);
             this.mainViewerBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mainViewerBox_MouseClick);
             // 
             // garbageTimer
@@ -95,7 +95,7 @@
             // repeatInputTimer
             // 
             this.repeatInputTimer.Enabled = true;
-            this.repeatInputTimer.Interval = 200D;
+            this.repeatInputTimer.Interval = 250D;
             this.repeatInputTimer.SynchronizingObject = this;
             this.repeatInputTimer.Elapsed += new System.Timers.ElapsedEventHandler(this.repeatInputTimer_Elapsed);
             // 

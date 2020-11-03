@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace The_Viewer
@@ -12,6 +13,7 @@ namespace The_Viewer
         private static bool inputsAllowed = false;
         // Max/restore window.
         private FormState formState = new FormState();
+        private bool isAutoPlaying = false;
         private bool isMaximized = false;
         #endregion
 
@@ -66,26 +68,14 @@ namespace The_Viewer
         {
             if (inputsAllowed)
             {
-                bool thatTimerDetector = false;
+                repeatInputTimer.Enabled = false;
+                inputsAllowed = false;
 
                 if (autoplayTimer.Enabled)
-                {
-                    thatTimerDetector = true;
                     autoplayTimer.Enabled = false;
-                }
-                if (thatTimerDetector)
-                    autoplayTimer.Enabled = true;
-
-
-                inputsAllowed = false;
-                mainViewerBox.Image = null;
-                mainViewerBox.Image = ImageOperations.GetNextImage();
-                workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
-
-                GC.Collect();
-
-                if (thatTimerDetector)
-                    autoplayTimer.Enabled = true;
+                
+                ImageOperations.GetNextImage();
+                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath());
             }
         }
 
@@ -97,26 +87,24 @@ namespace The_Viewer
         {
             if (inputsAllowed)
             {
-                bool thatTimerDetector = false;
-
-                if (autoplayTimer.Enabled)
-                {
-                    thatTimerDetector = true;
-                    autoplayTimer.Enabled = false;
-                }
-                if (thatTimerDetector)
-                    autoplayTimer.Enabled = true;
-
+                repeatInputTimer.Enabled = false;
                 inputsAllowed = false;
-                mainViewerBox.Image = null;
-                mainViewerBox.Image = ImageOperations.GetPreviousImage();
-                workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
 
-                GC.Collect();
-
-                if (thatTimerDetector)
-                    autoplayTimer.Enabled = true;
+                ImageOperations.GetPreviousImage();
+                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath());
             }
+        }
+
+        private void mainViewerBox_LoadCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
+        {
+            GC.Collect();
+
+            workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
+
+            if (isAutoPlaying)
+                autoplayTimer.Enabled = true;
+
+            repeatInputTimer.Enabled = true;
         }
 
         /// <summary>
@@ -140,12 +128,14 @@ namespace The_Viewer
             {
                 timerToggleButton.Text = "Timer: On";
                 timerToggleButton.BackColor = Color.FromArgb(0, 128, 0);
+                isAutoPlaying = true;
                 autoplayTimer.Enabled = true;
             }
             else
             {
                 timerToggleButton.Text = "Timer: Off";
                 timerToggleButton.BackColor = Color.FromArgb(128, 0, 0);
+                isAutoPlaying = false;
                 autoplayTimer.Enabled = false;
             }
         }
@@ -202,8 +192,7 @@ namespace The_Viewer
         /// <param name="e"></param>
         private void repeatInputTimer_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
         {
-            if (!inputsAllowed)
-                inputsAllowed = true;
+            inputsAllowed = true;
         }
 
         /// <summary>
@@ -322,9 +311,9 @@ namespace The_Viewer
             }
         }
 
-        private void Form1_MouseWheel(object sender, MouseEventArgs mouseEvent)
+        private void Form1_MouseWheel(object sender, MouseEventArgs e)
         {
-            if(mouseEvent.Delta > 0)
+            if(e.Delta > 0)
             {
                 // Scrolled up.
                 if (timerSelectionBox.SelectedIndex > 0)

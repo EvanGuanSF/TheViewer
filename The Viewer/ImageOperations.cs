@@ -29,9 +29,7 @@ namespace The_Viewer
         /// <summary>
         /// Gets next image.
         /// </summary>
-        /// <returns>Next image</returns>
-        // Returns image given options set.
-        public static Image GetNextImage()
+        public static void GetNextImage()
         {
             // Try to return the next valid image in the list.
             bool imageFound = false;
@@ -51,16 +49,12 @@ namespace The_Viewer
 
                 imageFound = CheckFileExists();
             }
-
-            // Return the current image.
-            return GetCurrentImage();
         }
 
         /// <summary>
         /// Gets previous image path from the Images list.
         /// </summary>
-        /// <returns>Previous image.</returns>
-        public static Image GetPreviousImage()
+        public static void GetPreviousImage()
         {
             // Try to return the previous valid image in the list.
             bool imageFound = false;
@@ -83,11 +77,12 @@ namespace The_Viewer
 
                 loopCount++;
             }
-
-            // Return the current image.
-            return GetCurrentImage();
         }
 
+        /// <summary>
+        /// Checks to see if the file at the current filePaths index exists.
+        /// </summary>
+        /// <returns>bool representing the existence of a valid file at the current filePaths index.</returns>
         private static bool CheckFileExists()
         {
             // Check the path at the new index to see if it exists.
