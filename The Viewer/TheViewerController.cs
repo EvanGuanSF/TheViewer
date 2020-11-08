@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 namespace The_Viewer
 {
@@ -35,11 +36,10 @@ namespace The_Viewer
                 //* Make sure it's actually a picture file.
                 //if (args != null && args.Length > 0 && (Path.GetExtension(args[0]) == ".jpg" || Path.GetExtension(args[0]) == ".png" || Path.GetExtension(args[0]) == ".bmp"))
                 ImageOperations.SetWorkingDir(Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]));
-                ImageOperations.PathToCurrentIndex(Environment.GetCommandLineArgs()[1]);
+                ImageOperations.SetIndexFromPathOrdered(Environment.GetCommandLineArgs()[1]);
 
                 mainViewerBox.Image = null;
-                mainViewerBox.Image = ImageOperations.GetCurrentImage();
-                workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
+                GetCurrentImage();
 
                 GC.Collect();
             }
@@ -49,8 +49,7 @@ namespace The_Viewer
                 ImageOperations.SetWorkingDir(Directory.GetCurrentDirectory());
 
                 mainViewerBox.Image = null;
-                mainViewerBox.Image = ImageOperations.GetCurrentImage();
-                workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
+                GetCurrentImage();
             }
 
             // Sets up check boxes, enablers, etc.
@@ -74,8 +73,8 @@ namespace The_Viewer
                 if (autoplayTimer.Enabled)
                     autoplayTimer.Enabled = false;
                 
-                ImageOperations.GetNextImage();
-                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath());
+                ImageOperations.GetNextImage(randomizedImage: randomOrderCheckBox.Checked);
+                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
             }
         }
 
@@ -90,16 +89,21 @@ namespace The_Viewer
                 repeatInputTimer.Enabled = false;
                 inputsAllowed = false;
 
-                ImageOperations.GetPreviousImage();
-                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath());
+                ImageOperations.GetPreviousImage(randomizedImage: randomOrderCheckBox.Checked);
+                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
             }
+        }
+
+        private void GetCurrentImage()
+        {
+            mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
         }
 
         private void mainViewerBox_LoadCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
         {
             GC.Collect();
 
-            workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
+            workingPathDisplay.Text = ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked);
 
             if (isAutoPlaying)
                 autoplayTimer.Enabled = true;
@@ -227,6 +231,27 @@ namespace The_Viewer
         }
 
         /// <summary>
+        /// CheckBox event for toggling randomized picture ordering.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void randomOrderCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            if(randomOrderCheckBox.Checked)
+            {
+                Console.WriteLine("checked");
+                ImageOperations.InitRandomizedImages();
+                GetCurrentImage();
+            }
+            if (!randomOrderCheckBox.Checked)
+            {
+                Console.WriteLine("unchecked");
+                ImageOperations.StopRandomizedImages();
+                GetCurrentImage();
+            }
+        }
+
+        /// <summary>
         /// Listens for working directory browsing button click.
         /// Opens dialog to find a new browsing folder.
         /// Checks if folder exists, calls ImageStuff to reset and reseed image lists.
@@ -241,8 +266,7 @@ namespace The_Viewer
                 ImageOperations.SetWorkingDir(selectFolderDialog.SelectedPath);
 
                 mainViewerBox.Image = null;
-                mainViewerBox.Image = ImageOperations.GetCurrentImage();
-                workingPathDisplay.Text = ImageOperations.GetCurrentImagePath();
+                GetCurrentImage();
             }
         }
 
@@ -360,7 +384,7 @@ namespace The_Viewer
                 mainViewerPanel.Size = new Size(ViewerDimensions.mainWidth, ViewerDimensions.mainHeight);
                 this.MaximumSize = Screen.PrimaryScreen.Bounds.Size;
                 ViewerDimensions.SetFullScreenSizes(Screen.PrimaryScreen.Bounds.Size);
-                mainViewerBox.Image = ImageOperations.GetCurrentImage();
+                GetCurrentImage();
 
                 Cursor.Hide();
 
@@ -377,7 +401,7 @@ namespace The_Viewer
                 this.MaximumSize = Screen.PrimaryScreen.WorkingArea.Size;
                 ViewerDimensions.SetRegularSizes(Screen.PrimaryScreen.WorkingArea.Size);
                 mainViewerPanel.Size = new Size(ViewerDimensions.panelWidth, ViewerDimensions.panelHeight);
-                mainViewerBox.Image = ImageOperations.GetCurrentImage();
+                GetCurrentImage();
 
                 Cursor.Show();
 

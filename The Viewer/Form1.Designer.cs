@@ -42,6 +42,7 @@
             this.nextPictureButton = new System.Windows.Forms.Button();
             this.previousPictureButton = new System.Windows.Forms.Button();
             this.viewerControlsPanel = new System.Windows.Forms.Panel();
+            this.randomOrderCheckBox = new System.Windows.Forms.CheckBox();
             this.mainViewerPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.mainViewerBox)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.garbageTimer)).BeginInit();
@@ -62,7 +63,7 @@
             this.mainViewerPanel.Location = new System.Drawing.Point(0, 0);
             this.mainViewerPanel.Margin = new System.Windows.Forms.Padding(0);
             this.mainViewerPanel.Name = "mainViewerPanel";
-            this.mainViewerPanel.Size = new System.Drawing.Size(1000, 976);
+            this.mainViewerPanel.Size = new System.Drawing.Size(1920, 1056);
             this.mainViewerPanel.TabIndex = 0;
             // 
             // mainViewerBox
@@ -72,7 +73,7 @@
             this.mainViewerBox.Location = new System.Drawing.Point(0, 0);
             this.mainViewerBox.Margin = new System.Windows.Forms.Padding(0);
             this.mainViewerBox.Name = "mainViewerBox";
-            this.mainViewerBox.Size = new System.Drawing.Size(1000, 976);
+            this.mainViewerBox.Size = new System.Drawing.Size(1920, 1056);
             this.mainViewerBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.mainViewerBox.TabIndex = 0;
             this.mainViewerBox.TabStop = false;
@@ -109,7 +110,7 @@
             this.browseForWorkingDirButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.browseForWorkingDirButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.browseForWorkingDirButton.ForeColor = System.Drawing.Color.White;
-            this.browseForWorkingDirButton.Location = new System.Drawing.Point(616, 1);
+            this.browseForWorkingDirButton.Location = new System.Drawing.Point(702, 1);
             this.browseForWorkingDirButton.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.browseForWorkingDirButton.Name = "browseForWorkingDirButton";
             this.browseForWorkingDirButton.Size = new System.Drawing.Size(75, 23);
@@ -167,11 +168,11 @@
             this.workingPathDisplay.AutoEllipsis = true;
             this.workingPathDisplay.AutoSize = true;
             this.workingPathDisplay.ForeColor = System.Drawing.Color.White;
-            this.workingPathDisplay.Location = new System.Drawing.Point(696, 6);
+            this.workingPathDisplay.Location = new System.Drawing.Point(782, 6);
             this.workingPathDisplay.MaximumSize = new System.Drawing.Size(1205, 13);
-            this.workingPathDisplay.MinimumSize = new System.Drawing.Size(1205, 13);
+            this.workingPathDisplay.MinimumSize = new System.Drawing.Size(250, 13);
             this.workingPathDisplay.Name = "workingPathDisplay";
-            this.workingPathDisplay.Size = new System.Drawing.Size(1205, 13);
+            this.workingPathDisplay.Size = new System.Drawing.Size(250, 13);
             this.workingPathDisplay.TabIndex = 6;
             this.workingPathDisplay.Text = "\r\ncurrent Image Path";
             this.workingPathDisplay.UseMnemonic = false;
@@ -211,17 +212,32 @@
             this.viewerControlsPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.viewerControlsPanel.BackColor = System.Drawing.Color.Black;
+            this.viewerControlsPanel.Controls.Add(this.randomOrderCheckBox);
             this.viewerControlsPanel.Controls.Add(this.previousPictureButton);
             this.viewerControlsPanel.Controls.Add(this.nextPictureButton);
             this.viewerControlsPanel.Controls.Add(this.workingPathDisplay);
             this.viewerControlsPanel.Controls.Add(this.timerToggleButton);
             this.viewerControlsPanel.Controls.Add(this.timerSelectionBox);
             this.viewerControlsPanel.Controls.Add(this.browseForWorkingDirButton);
-            this.viewerControlsPanel.Location = new System.Drawing.Point(0, 976);
+            this.viewerControlsPanel.Location = new System.Drawing.Point(0, 1056);
             this.viewerControlsPanel.Margin = new System.Windows.Forms.Padding(0);
             this.viewerControlsPanel.Name = "viewerControlsPanel";
-            this.viewerControlsPanel.Size = new System.Drawing.Size(1000, 24);
+            this.viewerControlsPanel.Size = new System.Drawing.Size(1920, 24);
             this.viewerControlsPanel.TabIndex = 7;
+            // 
+            // randomOrderCheckBox
+            // 
+            this.randomOrderCheckBox.AutoSize = true;
+            this.randomOrderCheckBox.ForeColor = System.Drawing.Color.White;
+            this.randomOrderCheckBox.Location = new System.Drawing.Point(618, 4);
+            this.randomOrderCheckBox.Name = "randomOrderCheckBox";
+            this.randomOrderCheckBox.Size = new System.Drawing.Size(79, 17);
+            this.randomOrderCheckBox.TabIndex = 7;
+            this.randomOrderCheckBox.TabStop = false;
+            this.randomOrderCheckBox.Text = "Randomize";
+            this.randomOrderCheckBox.TextImageRelation = System.Windows.Forms.TextImageRelation.TextAboveImage;
+            this.randomOrderCheckBox.UseVisualStyleBackColor = true;
+            this.randomOrderCheckBox.CheckedChanged += new System.EventHandler(this.randomOrderCheckBox_CheckedChanged);
             // 
             // Form1
             // 
@@ -229,7 +245,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.BackColor = System.Drawing.Color.Black;
-            this.ClientSize = new System.Drawing.Size(1000, 1000);
+            this.ClientSize = new System.Drawing.Size(1920, 1080);
             this.Controls.Add(this.viewerControlsPanel);
             this.Controls.Add(this.mainViewerPanel);
             this.DoubleBuffered = true;
@@ -269,6 +285,7 @@
         private System.Windows.Forms.ComboBox timerSelectionBox;
         private System.Windows.Forms.Button browseForWorkingDirButton;
         private System.Windows.Forms.Panel viewerControlsPanel;
+        private System.Windows.Forms.CheckBox randomOrderCheckBox;
     }
 }
 
