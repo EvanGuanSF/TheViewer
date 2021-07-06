@@ -38,55 +38,63 @@ namespace The_Viewer
         }
 
         /// <summary>
-        /// Gets next image from the appropriate Images struct.
+        /// Increments the current index of the the appropriate Images struct.
         /// </summary>
-        public static void GetNextImage(bool randomizedImage = false)
+        public static void IncrementCurrentImageIndex(bool randomizedImage = false)
         {
-            // Try to return the next valid image in the list.
-            bool imageFound = false;
             if(!randomizedImage)
             {
+                OrderedImages.curFilePathIndex = GetNextImageIndex(randomizedImage);
+            } else if (randomizedImage)
+            {
+                RandomizedImages.curFilePathIndex = GetNextImageIndex(randomizedImage);
+            }
+        }
+
+        /// <summary>
+        /// Gets the index of the next valid image from the appropriate Images struct.
+        /// </summary>
+        public static int GetNextImageIndex(bool randomizedImage = false)
+        {
+            int newIndex = -1;
+            // Try to return the index of the next valid image in the list.
+            bool imageFound = false;
+            if (!randomizedImage)
+            {
+                newIndex = OrderedImages.curFilePathIndex;
                 while (!imageFound && OrderedImages.filePaths.Count > 0)
                 {
                     // Calculate the new index.
-                    if (OrderedImages.filePaths.Count > 0 && (OrderedImages.curFilePathIndex + 1) < (OrderedImages.filePaths.Count))
-                    {
-                        // Not at last index and we have more items in the list. 
-                        OrderedImages.curFilePathIndex++;
-                    }
-                    else
-                    {
-                        // At last index or we have no more items in the list, set working index to 0.
-                        OrderedImages.curFilePathIndex = 0;
-                    }
+                    newIndex++;
+                    newIndex %= OrderedImages.filePaths.Count;
 
-                    imageFound = CheckFileExists();
+                    imageFound = CheckFileExists(randomizedImage, newIndex);
                 }
-            } else if (randomizedImage)
+
+                return imageFound ? newIndex : -1;
+            }
+            else if (randomizedImage)
             {
+                newIndex = RandomizedImages.curFilePathIndex;
                 while (!imageFound && RandomizedImages.filePaths.Count > 0)
                 {
                     // Calculate the new index.
-                    if (RandomizedImages.filePaths.Count > 0 && (RandomizedImages.curFilePathIndex + 1) < (RandomizedImages.filePaths.Count))
-                    {
-                        // Not at last index and we have more items in the list. 
-                        RandomizedImages.curFilePathIndex++;
-                    }
-                    else
-                    {
-                        // At last index or we have no more items in the list, set working index to 0.
-                        RandomizedImages.curFilePathIndex = 0;
-                    }
+                    newIndex++;
+                    newIndex %= RandomizedImages.filePaths.Count;
 
-                    imageFound = CheckFileExists(randomizedImage: true);
+                    imageFound = CheckFileExists(randomizedImage: true, newIndex);
                 }
+
+                return imageFound ? newIndex : -1;
             }
+
+            return -1;
         }
 
         /// <summary>
         /// Gets previous image path from the appropriate Images struct.
         /// </summary>
-        public static void GetPreviousImage(bool randomizedImage = false)
+        public static void DecrementCurrentImageIndex(bool randomizedImage = false)
         {
             // Try to return the previous valid image in the list.
             bool imageFound = false;
@@ -134,12 +142,17 @@ namespace The_Viewer
         /// Checks to see if the file at the current filePaths index exists.
         /// </summary>
         /// <returns>bool representing the existence of a valid file at the current filePaths index.</returns>
-        private static bool CheckFileExists(bool randomizedImage = false)
+        private static bool CheckFileExists(bool randomizedImage = false, int index = -1)
         {
+            if(index == -1)
+            {
+                index = !randomizedImage ? OrderedImages.curFilePathIndex : RandomizedImages.curFilePathIndex;
+            }
+
             if(!randomizedImage)
             {
                 // Check the path at the new index to see if it exists.
-                if (OrderedImages.curFilePathIndex >= 0 && OrderedImages.filePaths[OrderedImages.curFilePathIndex].Length >= 3 && File.Exists(OrderedImages.filePaths[OrderedImages.curFilePathIndex]))
+                if (index >= 0 && OrderedImages.filePaths[index].Length >= 3 && File.Exists(OrderedImages.filePaths[index]))
                 {
                     // If the file given the path is ok/exists, then break out of the loop and handle it.
                     return true;
@@ -148,13 +161,13 @@ namespace The_Viewer
                 if (OrderedImages.filePaths.Count > 0)
                 {
                     // If it does not, remove the path at the index and try again for the next index by repeating the while loop.
-                    OrderedImages.filePaths.RemoveAt(OrderedImages.curFilePathIndex);
+                    OrderedImages.filePaths.RemoveAt(index);
                     return false;
                 }
             } else if (randomizedImage)
             {
                 // Check the path at the new index to see if it exists.
-                if (RandomizedImages.curFilePathIndex >= 0 && RandomizedImages.filePaths[RandomizedImages.curFilePathIndex].Length >= 3 && File.Exists(RandomizedImages.filePaths[RandomizedImages.curFilePathIndex]))
+                if (RandomizedImages.curFilePathIndex >= 0 && RandomizedImages.filePaths[index].Length >= 3 && File.Exists(RandomizedImages.filePaths[index]))
                 {
                     // If the file given the path is ok/exists, then break out of the loop and handle it.
                     return true;
@@ -163,7 +176,7 @@ namespace The_Viewer
                 if (RandomizedImages.filePaths.Count > 0)
                 {
                     // If it does not, remove the path at the index and try again for the next index by repeating the while loop.
-                    RandomizedImages.filePaths.RemoveAt(RandomizedImages.curFilePathIndex);
+                    RandomizedImages.filePaths.RemoveAt(index);
                     return false;
                 }
             }
@@ -220,12 +233,6 @@ namespace The_Viewer
 
             // Quick and dirty shuffle via guid.
             RandomizedImages.filePaths = RandomizedImages.filePaths.OrderBy(a => Guid.NewGuid()).ToList();
-
-            // Display file paths.
-            //for (int i = 0; i < OrderedImages.filePaths.Count; i++)
-            //{
-            //    Console.WriteLine(RandomizedImages.filePaths[i]);
-            //}
         }
 
         public static void StopRandomizedImages()
@@ -322,13 +329,13 @@ namespace The_Viewer
             }
         }
 
-        // Get path of current list index.
-        public static string GetCurrentIndexPath(bool randomizedImage = false)
+        // Get current image index.
+        public static int GetCurrentIndexPath(bool randomizedImage = false)
         {
             if(!randomizedImage)
-                return Convert.ToString(OrderedImages.filePaths[OrderedImages.curFilePathIndex]);
+                return OrderedImages.curFilePathIndex;
             else
-                return Convert.ToString(RandomizedImages.filePaths[RandomizedImages.curFilePathIndex]);
+                return RandomizedImages.curFilePathIndex;
         }
 
         // Get current image path.
@@ -350,6 +357,37 @@ namespace The_Viewer
                 }
                 else
                     return Convert.ToString(RandomizedImages.filePaths[RandomizedImages.curFilePathIndex]);
+            }
+        }
+
+        /// <summary>
+        /// Gets the path of the image at the given index.
+        /// </summary>
+        /// <param name="randomizedImage"></param>
+        /// <returns></returns>
+        public static string GetImagePathAtIndex(int index, bool randomizedImage = false)
+        {
+            if (!randomizedImage)
+            {
+                return OrderedImages.filePaths[index];
+            }
+            else
+            {
+                return RandomizedImages.filePaths[index];
+            }
+        }
+
+
+        public static string GetNextImagePath(bool randomizedImage = false)
+        {
+
+            if (!randomizedImage)
+            {
+                return OrderedImages.filePaths[GetNextImageIndex(randomizedImage)];
+            }
+            else
+            {
+                return RandomizedImages.filePaths[GetNextImageIndex(randomizedImage)];
             }
         }
 

@@ -30,7 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.mainViewerPanel = new System.Windows.Forms.Panel();
-            this.mainViewerBox = new System.Windows.Forms.PictureBox();
+            this.pictureBoxTwo = new System.Windows.Forms.PictureBox();
+            this.pictureBoxOne = new System.Windows.Forms.PictureBox();
             this.garbageTimer = new System.Timers.Timer();
             this.autoplayTimer = new System.Timers.Timer();
             this.repeatInputTimer = new System.Timers.Timer();
@@ -44,7 +45,8 @@
             this.viewerControlsPanel = new System.Windows.Forms.Panel();
             this.randomOrderCheckBox = new System.Windows.Forms.CheckBox();
             this.mainViewerPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.mainViewerBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTwo)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOne)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.garbageTimer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.autoplayTimer)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.repeatInputTimer)).BeginInit();
@@ -59,26 +61,42 @@
             this.mainViewerPanel.AutoScroll = true;
             this.mainViewerPanel.BackColor = System.Drawing.Color.Transparent;
             this.mainViewerPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.mainViewerPanel.Controls.Add(this.mainViewerBox);
+            this.mainViewerPanel.Controls.Add(this.pictureBoxTwo);
+            this.mainViewerPanel.Controls.Add(this.pictureBoxOne);
             this.mainViewerPanel.Location = new System.Drawing.Point(0, 0);
             this.mainViewerPanel.Margin = new System.Windows.Forms.Padding(0);
             this.mainViewerPanel.Name = "mainViewerPanel";
             this.mainViewerPanel.Size = new System.Drawing.Size(1920, 1056);
             this.mainViewerPanel.TabIndex = 0;
             // 
-            // mainViewerBox
+            // pictureBoxTwo
             // 
-            this.mainViewerBox.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.mainViewerBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.mainViewerBox.Location = new System.Drawing.Point(0, 0);
-            this.mainViewerBox.Margin = new System.Windows.Forms.Padding(0);
-            this.mainViewerBox.Name = "mainViewerBox";
-            this.mainViewerBox.Size = new System.Drawing.Size(1920, 1056);
-            this.mainViewerBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.mainViewerBox.TabIndex = 0;
-            this.mainViewerBox.TabStop = false;
-            this.mainViewerBox.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.mainViewerBox_LoadCompleted);
-            this.mainViewerBox.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mainViewerBox_MouseClick);
+            this.pictureBoxTwo.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.pictureBoxTwo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxTwo.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxTwo.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxTwo.Name = "pictureBoxTwo";
+            this.pictureBoxTwo.Size = new System.Drawing.Size(1920, 1056);
+            this.pictureBoxTwo.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxTwo.TabIndex = 1;
+            this.pictureBoxTwo.TabStop = false;
+            this.pictureBoxTwo.Visible = false;
+            this.pictureBoxTwo.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.pictureBoxTwo_LoadCompleted);
+            this.pictureBoxTwo.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mainViewerBox_MouseClick);
+            // 
+            // pictureBoxOne
+            // 
+            this.pictureBoxOne.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.pictureBoxOne.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxOne.Location = new System.Drawing.Point(0, 0);
+            this.pictureBoxOne.Margin = new System.Windows.Forms.Padding(0);
+            this.pictureBoxOne.Name = "pictureBoxOne";
+            this.pictureBoxOne.Size = new System.Drawing.Size(1920, 1056);
+            this.pictureBoxOne.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxOne.TabIndex = 0;
+            this.pictureBoxOne.TabStop = false;
+            this.pictureBoxOne.LoadCompleted += new System.ComponentModel.AsyncCompletedEventHandler(this.pictureBoxOne_LoadCompleted);
+            this.pictureBoxOne.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mainViewerBox_MouseClick);
             // 
             // garbageTimer
             // 
@@ -138,7 +156,10 @@
             "15 Seconds",
             "20 Seconds",
             "25 Seconds",
-            "30 Seconds"});
+            "30 Seconds",
+            "40 Seconds",
+            "50 Seconds",
+            "60 Seconds"});
             this.timerSelectionBox.Location = new System.Drawing.Point(462, 2);
             this.timerSelectionBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 1);
             this.timerSelectionBox.Name = "timerSelectionBox";
@@ -260,7 +281,8 @@
             this.Text = "The View";
             this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.Form1_MouseWheel);
             this.mainViewerPanel.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.mainViewerBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxTwo)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxOne)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.garbageTimer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.autoplayTimer)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.repeatInputTimer)).EndInit();
@@ -273,7 +295,8 @@
         #endregion
 
         private System.Windows.Forms.Panel mainViewerPanel;
-        private System.Windows.Forms.PictureBox mainViewerBox;
+        private System.Windows.Forms.PictureBox pictureBoxOne;
+        private System.Windows.Forms.PictureBox pictureBoxTwo;
         private System.Timers.Timer garbageTimer;
         private System.Timers.Timer autoplayTimer;
         private System.Timers.Timer repeatInputTimer;

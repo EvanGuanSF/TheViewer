@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Threading.Tasks;
@@ -16,6 +18,15 @@ namespace The_Viewer
         private FormState formState = new FormState();
         private bool isAutoPlaying = false;
         private bool isMaximized = false;
+        private bool isStartingUp = true;
+        private List<Tuple<PictureBox, bool, bool>> pictureBoxes = new List<Tuple<PictureBox, bool, bool>>();
+
+        private struct PictureBoxManager
+        {
+            public static List<PictureBox> pictureBoxes = new List<PictureBox>();
+            public static List<bool> pictureBoxIsLoading = new List<bool>();
+            public static bool preloadNextImage = false;
+        }
         #endregion
 
         /// <summary>
@@ -30,15 +41,21 @@ namespace The_Viewer
 
             Console.WriteLine(Screen.PrimaryScreen.WorkingArea.Size);
 
+            // Setup the PBM
+            PictureBoxManager.pictureBoxes.Add(pictureBoxOne);
+            PictureBoxManager.pictureBoxes.Add(pictureBoxTwo);
+            PictureBoxManager.pictureBoxIsLoading.Add(false);
+            PictureBoxManager.pictureBoxIsLoading.Add(false);
+
             // Check if opened with file association. Check file, set path and index.
             if (Environment.GetCommandLineArgs().Length > 1 && Environment.GetCommandLineArgs() != null && File.Exists(Environment.GetCommandLineArgs()[1]))
             {
-                //* Make sure it's actually a picture file.
+                // Make sure it's actually a picture file.
                 //if (args != null && args.Length > 0 && (Path.GetExtension(args[0]) == ".jpg" || Path.GetExtension(args[0]) == ".png" || Path.GetExtension(args[0]) == ".bmp"))
                 ImageOperations.SetWorkingDir(Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]));
                 ImageOperations.SetIndexFromPathOrdered(Environment.GetCommandLineArgs()[1]);
 
-                mainViewerBox.Image = null;
+                PictureBoxManager.pictureBoxes[0].Image = null;
                 GetCurrentImage();
 
                 GC.Collect();
@@ -48,7 +65,7 @@ namespace The_Viewer
             {
                 ImageOperations.SetWorkingDir(Directory.GetCurrentDirectory());
 
-                mainViewerBox.Image = null;
+                PictureBoxManager.pictureBoxes[0].Image = null;
                 GetCurrentImage();
             }
 
@@ -73,8 +90,31 @@ namespace The_Viewer
                 if (autoplayTimer.Enabled)
                     autoplayTimer.Enabled = false;
                 
-                ImageOperations.GetNextImage(randomizedImage: randomOrderCheckBox.Checked);
-                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
+                ImageOperations.IncrementCurrentImageIndex(randomizedImage: randomOrderCheckBox.Checked);
+
+                // Check to see if we have a preload available.
+                if(!PictureBoxManager.pictureBoxIsLoading[1] && PictureBoxManager.pictureBoxes[1].ImageLocation == ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked))
+                {
+                    // If we have a preload ready, use it instead.
+                    PictureBoxManager.pictureBoxes[0].Image = PictureBoxManager.pictureBoxes[1].Image;
+                    PictureBoxManager.pictureBoxes[0].ImageLocation = PictureBoxManager.pictureBoxes[1].ImageLocation;
+
+                    // After setting that, preload the next image.
+                    PictureBoxManager.pictureBoxIsLoading[1] = true;
+                    PictureBoxManager.pictureBoxes[1].LoadAsync(ImageOperations.GetNextImagePath(randomizedImage: randomOrderCheckBox.Checked));
+                }
+                else
+                {
+                    // Cancel any loading operations in progress.
+                    PictureBoxManager.pictureBoxes[0].CancelAsync();
+                    PictureBoxManager.pictureBoxes[1].CancelAsync();
+
+                    // Otherwise, cancel any image loading in progress and reload images for both picture boxes.
+                    PictureBoxManager.pictureBoxes[0].LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
+                    // Set flag for preloading of a new picture.
+                    PictureBoxManager.preloadNextImage = true;
+                    Console.WriteLine("Manually loading.");
+                }
             }
         }
 
@@ -89,14 +129,37 @@ namespace The_Viewer
                 repeatInputTimer.Enabled = false;
                 inputsAllowed = false;
 
-                ImageOperations.GetPreviousImage(randomizedImage: randomOrderCheckBox.Checked);
-                mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
+                ImageOperations.DecrementCurrentImageIndex(randomizedImage: randomOrderCheckBox.Checked);
+
+                // Check to see if we can use the current image in pictureboxtwo as a buffer.
+                if (!PictureBoxManager.pictureBoxIsLoading[0] && PictureBoxManager.pictureBoxes[0].ImageLocation == ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked))
+                {
+                    PictureBoxManager.pictureBoxes[1].Image = PictureBoxManager.pictureBoxes[0].Image;
+                    PictureBoxManager.pictureBoxes[1].ImageLocation = PictureBoxManager.pictureBoxes[0].ImageLocation;
+                }
+                else
+                {
+                    // Cancel any loading operations in progress.
+                    PictureBoxManager.pictureBoxes[0].CancelAsync();
+                    PictureBoxManager.pictureBoxes[1].CancelAsync();
+
+                    PictureBoxManager.pictureBoxes[0].LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
+                    PictureBoxManager.preloadNextImage = true;
+
+                    Console.WriteLine("Manually loading and then preloading.");
+                }
             }
         }
 
         private void GetCurrentImage()
         {
-            mainViewerBox.LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
+            PictureBoxManager.pictureBoxes[0].LoadAsync(ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked));
+            if (isStartingUp)
+            {
+                PictureBoxManager.preloadNextImage = true;
+                Console.WriteLine("Initiating startup preload.");
+                isStartingUp = !isStartingUp;
+            }
         }
 
         private void mainViewerBox_LoadCompleted(object sender, System.ComponentModel.AsyncCompletedEventArgs e)
@@ -182,6 +245,15 @@ namespace The_Viewer
                 case 8:
                     autoplayTimer.Interval = baseInterval * 30;
                     break;
+                case 9:
+                    autoplayTimer.Interval = baseInterval * 40;
+                    break;
+                case 10:
+                    autoplayTimer.Interval = baseInterval * 50;
+                    break;
+                case 11:
+                    autoplayTimer.Interval = baseInterval * 60;
+                    break;
                 default:
                     autoplayTimer.Interval = baseInterval * 3;
                     break;
@@ -239,13 +311,11 @@ namespace The_Viewer
         {
             if(randomOrderCheckBox.Checked)
             {
-                Console.WriteLine("checked");
                 ImageOperations.InitRandomizedImages();
                 GetCurrentImage();
             }
             if (!randomOrderCheckBox.Checked)
             {
-                Console.WriteLine("unchecked");
                 ImageOperations.StopRandomizedImages();
                 GetCurrentImage();
             }
@@ -265,8 +335,44 @@ namespace The_Viewer
             {
                 ImageOperations.SetWorkingDir(selectFolderDialog.SelectedPath);
 
-                mainViewerBox.Image = null;
+                PictureBoxManager.pictureBoxes[0].Image = null;
                 GetCurrentImage();
+            }
+        }
+
+        private void pictureBoxOne_LoadCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            GC.Collect();
+
+            workingPathDisplay.Text = ImageOperations.GetCurrentImagePath(randomizedImage: randomOrderCheckBox.Checked);
+
+            if (isAutoPlaying)
+                autoplayTimer.Enabled = true;
+
+            repeatInputTimer.Enabled = true;
+
+            PictureBoxManager.pictureBoxIsLoading[0] = false;
+            Console.WriteLine("Primary image loaded.");
+
+            // If the flag has been set to preload the next image, do it here.
+            if (PictureBoxManager.preloadNextImage)
+            {
+                PictureBoxManager.pictureBoxIsLoading[1] = true;
+                PictureBoxManager.pictureBoxes[1].LoadAsync(ImageOperations.GetNextImagePath(randomizedImage: randomOrderCheckBox.Checked));
+
+                Console.WriteLine("Initiating preload.");
+            }
+        }
+
+        private void pictureBoxTwo_LoadCompleted(object sender, AsyncCompletedEventArgs e)
+        {
+            PictureBoxManager.pictureBoxIsLoading[1] = false;
+            Console.WriteLine("Secondary image loaded.");
+
+            if (PictureBoxManager.preloadNextImage)
+            {
+                PictureBoxManager.preloadNextImage = false;
+                Console.WriteLine("Preload done.");
             }
         }
 
