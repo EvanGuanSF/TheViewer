@@ -6,7 +6,7 @@
 This is a simple _recursive_ slideshow image viewer inspired by the old built-in Windows Image Viewer from Windows XP and 7. It looks at the directory it is based in and all subdirectories for files with certain image filetypes and adds them to a list for playback. Created using WinForms.
  
 ### Features and Notes
-- Multiple selectable timer options, ranging from 3 to 30 second intervals (toggle with spacebar or button click).
+- Multiple selectable timer options, ranging from 3 to 60 second intervals (toggle with spacebar or button click).
 - File deletion checking. The program will remove image paths it can not find from the working list and will attempt to find the next/previous image in the list.
 - Fullscreen mode with (toggle with 'F' or 'F11' key).
 - Quick hide viewer (activate with escape key).
